@@ -1,0 +1,12 @@
+---
+title: "Lab6"
+author: "Can Zhang"
+date: "2024-10-10"
+output: "github_document"
+---
+
+```{r}
+library(haven)
+library(dplyr)
+library(ggplot2)
+```
