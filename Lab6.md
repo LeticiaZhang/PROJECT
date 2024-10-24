@@ -1,4 +1,4 @@
-Lab6
+My Project
 ================
 Can Zhang
 2024-10-10
@@ -113,69 +113,35 @@ my_dataset$LONELY <- (my_dataset$LONELY_A + my_dataset$LONELY_B + my_dataset$LON
 # Normality Assumption
 
 ``` r
-# Check skewness and kurtosis
-skewness(my_dataset$LONELY)
-```
-
-    ## [1] 0.3604909
-
-``` r
-kurtosis(my_dataset$LONELY)
-```
-
-    ## [1] 2.235807
-
-``` r
-# Bootstrap the mean for a group to see the sampling distribution
-boot_mean <- function(data, indices) {
-  d <- data[indices, ]  # Resample data with replacement
-  return(mean(d$LONELY))  # Calculate mean of the 'LONELY' variable
-}
-my_group1 <- my_dataset[my_dataset$RACEREC == "(01) Non-Hispanic White", ]
-boot_results1 <- boot(data = my_group1, statistic = boot_mean, R = 1000)
-# Plot bootstrapped sampling distribution
-hist(boot_results1$t, main = "Bootstrapped Sampling Distribution of Mean", xlab = "Mean Loneliness")
+# Check the dependent variable loneliness
+# Density plot of loneliness
+ggplot(my_dataset, aes(x = LONELY)) + geom_density(adjust = 1.5) + facet_wrap(~RACEREC) + theme_classic()
 ```
 
 ![](Lab6_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
-my_group2 <- my_dataset[my_dataset$RACEREC == "(02) Non-Hispanic Black", ]
-boot_results2 <- boot(data = my_group2, statistic = boot_mean, R = 1000)
-hist(boot_results2$t, main = "Bootstrapped Sampling Distribution of Mean", xlab = "Mean Loneliness")
+# Check the independent variable religious engagement
+# Skewness and kurtosis for religious engagement
+skewness(my_dataset$RELIG_ENGAGEMENT)
 ```
 
-![](Lab6_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+    ## [1] 0.2339312
 
 ``` r
-my_group3 <- my_dataset[my_dataset$RACEREC == "(03) Non-Hispanic American Indian/Alaska Native
-", ]
-boot_results3 <- boot(data = my_group2, statistic = boot_mean, R = 1000)
-hist(boot_results3$t, main = "Bootstrapped Sampling Distribution of Mean", xlab = "Mean Loneliness")
+kurtosis(my_dataset$RELIG_ENGAGEMENT)
 ```
 
-![](Lab6_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
+    ## [1] 1.830046
 
-``` r
-my_group4 <- my_dataset[my_dataset$RACEREC == "(04) Hispanic", ]
-boot_results4 <- boot(data = my_group4, statistic = boot_mean, R = 1000)
-hist(boot_results4$t, main = "Bootstrapped Sampling Distribution of Mean", xlab = "Mean Loneliness")
-```
+The distribution of loneliness is positively skewed, as indicated by the
+density plot showing a positive skew.
 
-![](Lab6_files/figure-gfm/unnamed-chunk-3-4.png)<!-- -->
-
-``` r
-my_group5 <- my_dataset[my_dataset$RACEREC == "(05) Non-Hispanic Asian or Pacific Islander", ]
-boot_results5 <- boot(data = my_group5, statistic = boot_mean, R = 1000)
-hist(boot_results5$t, main = "Bootstrapped Sampling Distribution of Mean", xlab = "Mean Loneliness")
-```
-
-![](Lab6_files/figure-gfm/unnamed-chunk-3-5.png)<!-- --> The data
-distribution is generally normal, given that the skewness is not
-significantly deviant from 0 and kurtosis is not significantly deviant
-from 3. Moreover, the distribution of the sampling distribution of the
-mean for each group is generally normal from the histogram. Therefore,
-the normality assumption is generally fulfilled.
+The distribution of religious engagement is slightly less concentrated
+around the mean and has fewer extreme values in the tails compared to a
+normal distribution, as the kurtosis is lower than 3 (1.83). However,
+since the sample size is large enough, it is generally acceptable to
+have such kurtosis.
 
 # Equal Variance Assumption
 
@@ -190,3 +156,16 @@ leveneTest(LONELY ~ RACEREC, data = my_dataset)
 
 The Levene’s Test result is not significant, indicating that the
 variance is equal across groups (assumption is met).
+
+# Data Transformation
+
+``` r
+my_dataset$LONELY_log <- log(my_dataset$LONELY)
+
+ggplot(my_dataset, aes(x = LONELY_log)) + geom_density(adjust = 1.5) + facet_wrap(~RACEREC) + theme_classic()
+```
+
+![](Lab6_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+After the log transformation, the data distribution of loneliness is
+generally normal, according to the density plot.
