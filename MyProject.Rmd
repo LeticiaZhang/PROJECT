@@ -1,0 +1,100 @@
+---
+title: "My Project"
+author: "Can Zhang"
+date: "2024-10-24"
+output: "github_document"
+---
+# Load Packages and Dataset
+```{r}
+
+library(haven)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(car)
+library(moments)
+library(boot)
+library(bruceR)
+load("C:/Users/User/Downloads/ICPSR_38964-V2/ICPSR_38964/DS0001/38964-0001-Data.rda")
+dataset <- da38964.0001
+rm(da38964.0001)
+
+```
+
+# Data Cleaning
+```{r}
+
+#Select variables related to my research question
+my_dataset <- dataset %>% select(RELIG_ATTEND, RELIG_IMP, RACEREC, LONELY_A, LONELY_B, LONELY_C)
+my_dataset <- drop_na(my_dataset)
+summary(my_dataset)
+
+#recode and composite the variables
+my_dataset$RELIG_ATTEND <- 5 - as.numeric(my_dataset$RELIG_ATTEND)
+my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
+my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
+
+my_dataset$LONELY_A <- as.numeric(my_dataset$LONELY_A)
+my_dataset$LONELY_B <- as.numeric(my_dataset$LONELY_B)
+my_dataset$LONELY_C <- as.numeric(my_dataset$LONELY_C)
+my_dataset$LONELY <- (my_dataset$LONELY_A + my_dataset$LONELY_B + my_dataset$LONELY_C) / 3
+
+```
+
+# Statistical Assumptions and Data Transformation
+# Normality Assumption
+```{r}
+
+# Check the dependent variable loneliness
+# Density plot of loneliness
+ggplot(my_dataset, aes(x = LONELY)) + geom_density(adjust = 1.5) + facet_wrap(~RACEREC) + theme_classic()
+
+# Check the independent variable religious engagement
+# Skewness and kurtosis for religious engagement
+skewness(my_dataset$RELIG_ENGAGEMENT)
+kurtosis(my_dataset$RELIG_ENGAGEMENT)
+
+```
+
+The distribution of loneliness is positively skewed, as indicated by the density plot showing a positive skew.
+
+The distribution of religious engagement is slightly less concentrated around the mean and has fewer extreme values in the tails compared to a normal distribution, as the kurtosis is lower than 3 (1.83). However, since the sample size is large enough, it is generally acceptable to have such kurtosis.
+
+# Equal Variance Assumption
+```{r}
+
+leveneTest(LONELY ~ RACEREC, data = my_dataset)
+
+```
+
+The Levene's Test result is not significant, indicating that the variance is equal across groups (assumption is met).
+
+# Data Transformation
+```{r}
+
+my_dataset$LONELY_log <- log(my_dataset$LONELY)
+
+ggplot(my_dataset, aes(x = LONELY_log)) + geom_density(adjust = 1.5) + facet_wrap(~RACEREC) + theme_classic()
+
+```
+
+After the log transformation, the data distribution of loneliness is generally normal, according to the density plot.
+
+# Data Analysis
+```{r}
+
+cor_data <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_log, RACEREC)
+Corr(cor_data)
+
+PROCESS(my_dataset, y = "LONELY_log", x = "RELIG_ENGAGEMENT", mods = c("RACEREC"))
+
+```
+
+# Visualize the Results
+```{r}
+
+ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth() + theme_bruce()
+
+ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth(method = "lm") + theme_bruce() + facet_wrap(~RACEREC)
+
+```
