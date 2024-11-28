@@ -30,7 +30,7 @@ my_dataset <- drop_na(my_dataset)
 summary(my_dataset)
 
 #recode and composite the variables
-my_dataset$RELIG_ATTEND <- 5 - as.numeric(my_dataset$RELIG_ATTEND)
+my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
@@ -96,5 +96,25 @@ PROCESS(my_dataset, y = "LONELY_log", x = "RELIG_ENGAGEMENT", mods = c("RACEREC"
 ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth() + theme_bruce()
 
 ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth(method = "lm") + theme_bruce() + facet_wrap(~RACEREC)
+
+```
+
+# Exploratory Questions
+How do education affect the relationship between religious engagement and loneliness?
+```{r}
+
+my_dataset$EDUC <- dataset$EDUC
+summary(my_dataset$EDUC)
+
+leveneTest(LONELY_log ~ EDUC, data = my_dataset)
+my_dataset$LONELY_sqrt <- sqrt(my_dataset$LONELY)
+leveneTest(LONELY_sqrt ~ EDUC, data = my_dataset)
+skewness(my_dataset$LONELY_sqrt)
+kurtosis(my_dataset$LONELY_sqrt)
+
+cor_data1 <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_sqrt, EDUC)
+Corr(cor_data1)
+
+PROCESS(my_dataset, y = "LONELY_sqrt", x = "RELIG_ENGAGEMENT", mods = c("EDUC"))
 
 ```
