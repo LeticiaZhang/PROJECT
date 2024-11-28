@@ -137,7 +137,7 @@ summary(my_dataset)
 
 ``` r
 #recode and composite the variables
-my_dataset$RELIG_ATTEND <- 5 - as.numeric(my_dataset$RELIG_ATTEND)
+my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
@@ -344,3 +344,172 @@ ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geo
     ## `geom_smooth()` using formula = 'y ~ x'
 
 ![](MyProject_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+# Exploratory Questions
+
+How do education affect the relationship between religious engagement
+and loneliness?
+
+``` r
+my_dataset$EDUC <- dataset$EDUC
+summary(my_dataset$EDUC)
+```
+
+    ##                              (1) Did not complete high school 
+    ##                                                           374 
+    ##                                (2) High school diploma or GED 
+    ##                                                          2435 
+    ##            (3) Attended college but did not complete a degree 
+    ##                                                          1802 
+    ##                                          (4) Associate degree 
+    ##                                                           988 
+    ##                                         (5) Bachelor's degree 
+    ##                                                          1397 
+    ## (6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD) 
+    ##                                                           648
+
+``` r
+leveneTest(LONELY_log ~ EDUC, data = my_dataset)
+```
+
+    ## Levene's Test for Homogeneity of Variance (center = median)
+    ##         Df F value  Pr(>F)  
+    ## group    5  2.8827 0.01324 *
+    ##       7638                  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+my_dataset$LONELY_sqrt <- sqrt(my_dataset$LONELY)
+leveneTest(LONELY_sqrt ~ EDUC, data = my_dataset)
+```
+
+    ## Levene's Test for Homogeneity of Variance (center = median)
+    ##         Df F value  Pr(>F)  
+    ## group    5  2.0588 0.06745 .
+    ##       7638                  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+skewness(my_dataset$LONELY_sqrt)
+```
+
+    ## [1] 0.1014501
+
+``` r
+kurtosis(my_dataset$LONELY_sqrt)
+```
+
+    ## [1] 1.937552
+
+``` r
+cor_data1 <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_sqrt, EDUC)
+Corr(cor_data1)
+```
+
+    ## NOTE: `EDUC` transformed to numeric.
+    ## 
+    ## Pearson's r and 95% confidence intervals:
+    ## ─────────────────────────────────────────────────────────────────
+    ##                                   r       [95% CI]     p        N
+    ## ─────────────────────────────────────────────────────────────────
+    ## RELIG_ENGAGEMENT-LONELY_sqrt  -0.17 [-0.20, -0.15] <.001 *** 7644
+    ## RELIG_ENGAGEMENT-EDUC          0.13 [ 0.11,  0.15] <.001 *** 7644
+    ## LONELY_sqrt-EDUC              -0.12 [-0.14, -0.10] <.001 *** 7644
+    ## ─────────────────────────────────────────────────────────────────
+
+![](MyProject_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+    ## Correlation matrix is displayed in the RStudio `Plots` Pane.
+
+``` r
+PROCESS(my_dataset, y = "LONELY_sqrt", x = "RELIG_ENGAGEMENT", mods = c("EDUC"))
+```
+
+    ## 
+    ## ****************** PART 1. Regression Model Summary ******************
+    ## 
+    ## PROCESS Model Code : 1 (Hayes, 2018; www.guilford.com/p/hayes3)
+    ## PROCESS Model Type : Simple Moderation
+    ## -    Outcome (Y) : LONELY_sqrt
+    ## -  Predictor (X) : RELIG_ENGAGEMENT
+    ## -  Mediators (M) : -
+    ## - Moderators (W) : EDUC
+    ## - Covariates (C) : -
+    ## -   HLM Clusters : -
+    ## 
+    ## All numeric predictors have been grand-mean centered.
+    ## (For details, please see the help page of PROCESS.)
+    ## 
+    ## Formula of Outcome:
+    ## -    LONELY_sqrt ~ RELIG_ENGAGEMENT*EDUC
+    ## 
+    ## CAUTION:
+    ##   Fixed effect (coef.) of a predictor involved in an interaction
+    ##   denotes its "simple effect/slope" at the other predictor = 0.
+    ##   Only when all predictors in an interaction are mean-centered
+    ##   can the fixed effect denote the "main effect"!
+    ##   
+    ## Model Summary
+    ## 
+    ## ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ##                                                                                     (1) LONELY_sqrt  (2) LONELY_sqrt
+    ## ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## (Intercept)                                                                            1.326 ***        1.386 ***   
+    ##                                                                                       (0.003)          (0.012)      
+    ## RELIG_ENGAGEMENT                                                                      -0.035 ***       -0.042 ***   
+    ##                                                                                       (0.002)          (0.012)      
+    ## EDUC(2) High school diploma or GED                                                                     -0.046 ***   
+    ##                                                                                                        (0.013)      
+    ## EDUC(3) Attended college but did not complete a degree                                                 -0.045 ***   
+    ##                                                                                                        (0.014)      
+    ## EDUC(4) Associate degree                                                                               -0.064 ***   
+    ##                                                                                                        (0.015)      
+    ## EDUC(5) Bachelor's degree                                                                              -0.097 ***   
+    ##                                                                                                        (0.014)      
+    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)                                      -0.097 ***   
+    ##                                                                                                        (0.016)      
+    ## RELIG_ENGAGEMENT:EDUC(2) High school diploma or GED                                                     0.011       
+    ##                                                                                                        (0.012)      
+    ## RELIG_ENGAGEMENT:EDUC(3) Attended college but did not complete a degree                                 0.010       
+    ##                                                                                                        (0.013)      
+    ## RELIG_ENGAGEMENT:EDUC(4) Associate degree                                                               0.005       
+    ##                                                                                                        (0.013)      
+    ## RELIG_ENGAGEMENT:EDUC(5) Bachelor's degree                                                              0.012       
+    ##                                                                                                        (0.013)      
+    ## RELIG_ENGAGEMENT:EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)                      0.007       
+    ##                                                                                                        (0.014)      
+    ## ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## R^2                                                                                    0.030            0.042       
+    ## Adj. R^2                                                                               0.030            0.040       
+    ## Num. obs.                                                                           7644             7644           
+    ## ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## Note. * p < .05, ** p < .01, *** p < .001.
+    ## 
+    ## ************ PART 2. Mediation/Moderation Effect Estimate ************
+    ## 
+    ## Package Use : ‘interactions’ (v1.2.0)
+    ## Effect Type : Simple Moderation (Model 1)
+    ## Sample Size : 7644
+    ## Random Seed : -
+    ## Simulations : -
+    ## 
+    ## Interaction Effect on "LONELY_sqrt" (Y)
+    ## ────────────────────────────────────────────────
+    ##                             F df1  df2     p    
+    ## ────────────────────────────────────────────────
+    ## RELIG_ENGAGEMENT * EDUC  0.35   5 7632  .884    
+    ## ────────────────────────────────────────────────
+    ## 
+    ## Simple Slopes: "RELIG_ENGAGEMENT" (X) ==> "LONELY_sqrt" (Y)
+    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ##  "EDUC"                                                        Effect    S.E.      t     p             [95% CI]
+    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    ##  (1) Did not complete high school                              -0.042 (0.012) -3.625 <.001 *** [-0.065, -0.019]
+    ##  (2) High school diploma or GED                                -0.031 (0.004) -7.262 <.001 *** [-0.040, -0.023]
+    ##  (3) Attended college but did not complete a degree            -0.032 (0.005) -6.730 <.001 *** [-0.041, -0.023]
+    ##  (4) Associate degree                                          -0.037 (0.006) -5.848 <.001 *** [-0.050, -0.025]
+    ##  (5) Bachelor's degree                                         -0.030 (0.005) -5.939 <.001 *** [-0.040, -0.020]
+    ##  (6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD) -0.035 (0.007) -4.696 <.001 *** [-0.050, -0.020]
+    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
