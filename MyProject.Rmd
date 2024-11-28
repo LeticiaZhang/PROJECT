@@ -15,7 +15,7 @@ library(car)
 library(moments)
 library(boot)
 library(bruceR)
-load("C:/Users/User/Downloads/ICPSR_38964-V2/ICPSR_38964/DS0001/38964-0001-Data.rda")
+load("C:/Users/zhang/OneDrive/2024-25/PSY329/ICPSR_38964-V2/ICPSR_38964/DS0001/38964-0001-Data.rda")
 dataset <- da38964.0001
 rm(da38964.0001)
 
@@ -93,9 +93,17 @@ PROCESS(my_dataset, y = "LONELY_log", x = "RELIG_ENGAGEMENT", mods = c("RACEREC"
 # Visualize the Results
 ```{r}
 
-ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth() + theme_bruce()
+ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point(alpha = .3) + geom_smooth(method = "lm", se = TRUE, linetype = "solid", color = "#e7553d") +  theme_minimal(base_size = 14)
 
-ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geom_smooth(method = "lm") + theme_bruce() + facet_wrap(~RACEREC)
+ggplot(data = cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) +
+  geom_point(alpha = .3) +
+  geom_smooth(method = "lm", se = TRUE, linetype = "solid", color = "#e7553d") +
+  facet_wrap(~RACEREC) +
+  labs(title = "Correlation between Religious Engagement and Loneliness",
+       subtitle = "Faceted by Race/Ethnicity",
+       x = "Log-transformed Loneliness", 
+       y = "Religious Engagement") +
+  theme_minimal(base_size = 14)
 
 ```
 
@@ -131,5 +139,27 @@ cor_data1 <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_sqrt, EDUC)
 Corr(cor_data1)
 
 PROCESS(my_dataset, y = "LONELY_sqrt", x = "RELIG_ENGAGEMENT", mods = c("EDUC"))
+
+```
+
+```{r}
+
+model_main <- lm(LONELY_log ~ RELIG_ENGAGEMENT + RACEREC, data = my_dataset)
+summary(model_main)
+
+model_interaction <- lm(LONELY_log ~ RELIG_ENGAGEMENT * RACEREC, data = my_dataset)
+summary(model_interaction)
+
+model_control <- lm(LONELY_log ~ RELIG_ENGAGEMENT * RACEREC + EDUC, data = my_dataset)
+summary(model_control)
+
+# Residual plot for homoscedasticity
+plot(model_control, which = 1)
+
+# Q-Q plot for normality of residuals
+plot(model_control, which = 2)
+
+library(interactions)
+interact_plot(model_control, pred = RELIG_ENGAGEMENT, modx = RACEREC, interval = TRUE)
 
 ```
