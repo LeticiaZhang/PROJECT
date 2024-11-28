@@ -345,6 +345,91 @@ ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geo
 
 ![](MyProject_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
+# Reliability and Factor Analysis
+
+``` r
+# Cronbach's Alpha
+Alpha(my_dataset, vars = c("LONELY_A", "LONELY_B", "LONELY_C"))
+```
+
+    ## 
+    ## Reliability Analysis
+    ## 
+    ## Summary:
+    ## Total Items: 3
+    ## Scale Range: 1 ~ 5
+    ## Total Cases: 7644
+    ## Valid Cases: 7644 (100.0%)
+    ## 
+    ## Scale Statistics:
+    ## Mean = 1.816
+    ## S.D. = 0.647
+    ## Cronbach’s α = 0.816
+    ## McDonald’s ω = 0.823
+    ## 
+    ## Item Statistics (Cronbach’s α If Item Deleted):
+    ## ───────────────────────────────────────────────────
+    ##            Mean    S.D. Item-Rest Cor. Cronbach’s α
+    ## ───────────────────────────────────────────────────
+    ## LONELY_A  1.776 (0.750)          0.575        0.838
+    ## LONELY_B  1.818 (0.746)          0.721        0.692
+    ## LONELY_C  1.854 (0.774)          0.712        0.699
+    ## ───────────────────────────────────────────────────
+    ## Item-Rest Cor. = Corrected Item-Total Correlation
+
+``` r
+# Factor Analysis
+EFA(my_dataset, vars = c("LONELY_A", "LONELY_B", "LONELY_C"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+```
+
+    ## 
+    ## Explanatory Factor Analysis
+    ## 
+    ## Summary:
+    ## Total Items: 3
+    ## Scale Range: 1 ~ 5
+    ## Total Cases: 7644
+    ## Valid Cases: 7644 (100.0%)
+    ## 
+    ## Extraction Method:
+    ## - Principal Axis Factor Analysis
+    ## Rotation Method:
+    ## - (Only one component was extracted. The solution was not rotated.)
+    ## 
+    ## KMO and Bartlett's Test:
+    ## - Kaiser-Meyer-Olkin (KMO) Measure of Sampling Adequacy: MSA = 0.685
+    ## - Bartlett's Test of Sphericity: Approx. χ²(3) = 8672.59, p < 1e-99 ***
+    ## 
+    ## Total Variance Explained:
+    ## ───────────────────────────────────────────────────────────────────────────────
+    ##           Eigenvalue Variance % Cumulative % SS Loading Variance % Cumulative %
+    ## ───────────────────────────────────────────────────────────────────────────────
+    ## Factor 1       2.196     73.212       73.212      1.836     61.185       61.185
+    ## Factor 2       0.525     17.492       90.704                                   
+    ## Factor 3       0.279      9.296      100.000                                   
+    ## ───────────────────────────────────────────────────────────────────────────────
+    ## 
+    ## Factor Loadings (Sorted by Size):
+    ## ───────────────────────────
+    ##             PA1 Communality
+    ## ───────────────────────────
+    ## LONELY_B  0.855       0.730
+    ## LONELY_C  0.843       0.710
+    ## LONELY_A  0.629       0.395
+    ## ───────────────────────────
+    ## Communality = Sum of Squared (SS) Factor Loadings
+    ## (Uniqueness = 1 - Communality)
+
+![](MyProject_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+# Spearman's Rho
+spearman_rho <- cor(my_dataset$RELIG_ATTEND, my_dataset$RELIG_IMP, method = "spearman")
+print(spearman_rho)
+```
+
+    ## [1] 0.600681
+
 # Exploratory Questions
 
 How do education affect the relationship between religious engagement
@@ -419,7 +504,7 @@ Corr(cor_data1)
     ## LONELY_sqrt-EDUC              -0.12 [-0.14, -0.10] <.001 *** 7644
     ## ─────────────────────────────────────────────────────────────────
 
-![](MyProject_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](MyProject_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
     ## Correlation matrix is displayed in the RStudio `Plots` Pane.
 

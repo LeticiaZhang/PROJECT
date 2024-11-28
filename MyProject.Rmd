@@ -99,6 +99,21 @@ ggplot(cor_data, aes(x = LONELY_log, y = RELIG_ENGAGEMENT)) + geom_point() + geo
 
 ```
 
+# Reliability and Factor Analysis
+```{r}
+
+# Cronbach's Alpha
+Alpha(my_dataset, vars = c("LONELY_A", "LONELY_B", "LONELY_C"))
+
+# Factor Analysis
+EFA(my_dataset, vars = c("LONELY_A", "LONELY_B", "LONELY_C"), method = "pa", plot.scree = TRUE, nfactors = c("parallel"))
+
+# Spearman's Rho
+spearman_rho <- cor(my_dataset$RELIG_ATTEND, my_dataset$RELIG_IMP, method = "spearman")
+print(spearman_rho)
+
+```
+
 # Exploratory Questions
 How do education affect the relationship between religious engagement and loneliness?
 ```{r}
