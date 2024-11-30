@@ -88,6 +88,8 @@ library(bruceR)
     ## install.packages("bruceR", dep=TRUE)
 
 ``` r
+library(interactions)
+library(ggrepel)
 load("C:/Users/zhang/OneDrive/2024-25/PSY329/ICPSR_38964-V2/ICPSR_38964/DS0001/38964-0001-Data.rda")
 dataset <- da38964.0001
 rm(da38964.0001)
@@ -141,11 +143,33 @@ my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
+my_dataset$RACEREC <- gsub("Non-Hispanic ", "", my_dataset$RACEREC)
+
 my_dataset$LONELY_A <- as.numeric(my_dataset$LONELY_A)
 my_dataset$LONELY_B <- as.numeric(my_dataset$LONELY_B)
 my_dataset$LONELY_C <- as.numeric(my_dataset$LONELY_C)
 my_dataset$LONELY <- (my_dataset$LONELY_A + my_dataset$LONELY_B + my_dataset$LONELY_C) / 3
+
+race_summary <- my_dataset %>%
+  group_by(RACEREC) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100) 
+
+ggplot(race_summary, aes(x = "", y = percentage, fill = RACEREC)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_label_repel(aes(label = paste0(round(percentage, 1), "%")),
+                   position = position_stack(vjust = 0.5),
+                   box.padding = 0.5,
+                   show.legend = FALSE) +
+  labs(title = "Race Composition of Participants", fill = "Race/Ethnicity") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text = element_blank(), axis.title = element_blank(), panel.grid = element_blank()) +
+  theme(plot.background = element_rect(fill = "#f6c1ad", color = NA)) + 
+  scale_fill_brewer(palette = "Set3")
 ```
+
+![](MyProject_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 # Statistical Assumptions and Data Transformation
 
@@ -188,6 +212,9 @@ have such kurtosis.
 leveneTest(LONELY ~ RACEREC, data = my_dataset)
 ```
 
+    ## Warning in leveneTest.default(y = y, group = group, ...): group coerced to
+    ## factor.
+
     ## Levene's Test for Homogeneity of Variance (center = median)
     ##         Df F value Pr(>F)
     ## group    6  1.3081 0.2495
@@ -216,6 +243,15 @@ cor_data <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_log, RACEREC)
 Corr(cor_data)
 ```
 
+    ## Warning in Corr(cor_data): 强制改变过程中产生了NA
+
+    ## Warning in sqrt(n - 2): 产生了NaNs
+
+    ## Warning in psych::corr.test(data.new, method = method, adjust = p.adjust, :
+    ## Number of subjects must be greater than 3 to find confidence intervals.
+
+    ## Warning in sqrt(n[lower.tri(n)] - 3): 产生了NaNs
+
     ## NOTE: `RACEREC` transformed to numeric.
     ## 
     ## Pearson's r and 95% confidence intervals:
@@ -223,8 +259,8 @@ Corr(cor_data)
     ##                                  r       [95% CI]     p        N
     ## ────────────────────────────────────────────────────────────────
     ## RELIG_ENGAGEMENT-LONELY_log  -0.17 [-0.19, -0.15] <.001 *** 7644
-    ## RELIG_ENGAGEMENT-RACEREC      0.01 [-0.01,  0.04]  .240     7644
-    ## LONELY_log-RACEREC            0.01 [-0.01,  0.03]  .411     7644
+    ## RELIG_ENGAGEMENT-RACEREC           [   NA,   NaN]              0
+    ## LONELY_log-RACEREC                 [   NA,   NaN]              0
     ## ────────────────────────────────────────────────────────────────
 
 ![](MyProject_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
@@ -261,42 +297,42 @@ PROCESS(my_dataset, y = "LONELY_log", x = "RELIG_ENGAGEMENT", mods = c("RACEREC"
     ##   
     ## Model Summary
     ## 
-    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────
-    ##                                                                          (1) LONELY_log  (2) LONELY_log
-    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────
-    ## (Intercept)                                                                 0.531 ***       0.528 ***  
-    ##                                                                            (0.004)         (0.005)     
-    ## RELIG_ENGAGEMENT                                                           -0.053 ***      -0.056 ***  
-    ##                                                                            (0.004)         (0.004)     
-    ## RACEREC(02) Non-Hispanic Black                                                             -0.004      
-    ##                                                                                            (0.013)     
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                                      0.007      
-    ##                                                                                            (0.036)     
-    ## RACEREC(04) Hispanic                                                                        0.016      
-    ##                                                                                            (0.011)     
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                                         -0.013      
-    ##                                                                                            (0.019)     
-    ## RACEREC(06) Other and 2 or more races                                                       0.055      
-    ##                                                                                            (0.039)     
-    ## RACEREC(98) Don't know                                                                      0.109      
-    ##                                                                                            (0.182)     
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                                             0.010      
-    ##                                                                                            (0.011)     
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native                    -0.058      
-    ##                                                                                            (0.033)     
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                                      -0.004      
-    ##                                                                                            (0.010)     
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander                         0.066 ***  
-    ##                                                                                            (0.016)     
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                                     -0.045      
-    ##                                                                                            (0.032)     
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                                     0.154      
-    ##                                                                                            (0.146)     
-    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────
-    ## R^2                                                                         0.029           0.033      
-    ## Adj. R^2                                                                    0.029           0.031      
-    ## Num. obs.                                                                7644            7644          
-    ## ───────────────────────────────────────────────────────────────────────────────────────────────────────
+    ## ──────────────────────────────────────────────────────────────────────────────────────────
+    ##                                                             (1) LONELY_log  (2) LONELY_log
+    ## ──────────────────────────────────────────────────────────────────────────────────────────
+    ## (Intercept)                                                    0.531 ***       0.528 ***  
+    ##                                                               (0.004)         (0.005)     
+    ## RELIG_ENGAGEMENT                                              -0.053 ***      -0.056 ***  
+    ##                                                               (0.004)         (0.004)     
+    ## RACEREC(02) Black                                                             -0.004      
+    ##                                                                               (0.013)     
+    ## RACEREC(03) American Indian/Alaska Native                                      0.007      
+    ##                                                                               (0.036)     
+    ## RACEREC(04) Hispanic                                                           0.016      
+    ##                                                                               (0.011)     
+    ## RACEREC(05) Asian or Pacific Islander                                         -0.013      
+    ##                                                                               (0.019)     
+    ## RACEREC(06) Other and 2 or more races                                          0.055      
+    ##                                                                               (0.039)     
+    ## RACEREC(98) Don't know                                                         0.109      
+    ##                                                                               (0.182)     
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                                             0.010      
+    ##                                                                               (0.011)     
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native                    -0.058      
+    ##                                                                               (0.033)     
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                         -0.004      
+    ##                                                                               (0.010)     
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander                         0.066 ***  
+    ##                                                                               (0.016)     
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                        -0.045      
+    ##                                                                               (0.032)     
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                        0.154      
+    ##                                                                               (0.146)     
+    ## ──────────────────────────────────────────────────────────────────────────────────────────
+    ## R^2                                                            0.029           0.033      
+    ## Adj. R^2                                                       0.029           0.031      
+    ## Num. obs.                                                   7644            7644          
+    ## ──────────────────────────────────────────────────────────────────────────────────────────
     ## Note. * p < .05, ** p < .01, *** p < .001.
     ## 
     ## ************ PART 2. Mediation/Moderation Effect Estimate ************
@@ -315,17 +351,17 @@ PROCESS(my_dataset, y = "LONELY_log", x = "RELIG_ENGAGEMENT", mods = c("RACEREC"
     ## ───────────────────────────────────────────────────
     ## 
     ## Simple Slopes: "RELIG_ENGAGEMENT" (X) ==> "LONELY_log" (Y)
-    ## ──────────────────────────────────────────────────────────────────────────────────────────────────
-    ##  "RACEREC"                                       Effect    S.E.       t     p             [95% CI]
-    ## ──────────────────────────────────────────────────────────────────────────────────────────────────
-    ##  (01) Non-Hispanic White                         -0.056 (0.004) -12.517 <.001 *** [-0.064, -0.047]
-    ##  (02) Non-Hispanic Black                         -0.045 (0.010)  -4.527 <.001 *** [-0.065, -0.026]
-    ##  (03) Non-Hispanic American Indian/Alaska Native -0.114 (0.032)  -3.535 <.001 *** [-0.177, -0.051]
-    ##  (04) Hispanic                                   -0.060 (0.009)  -7.013 <.001 *** [-0.077, -0.043]
-    ##  (05) Non-Hispanic Asian or Pacific Islander      0.011 (0.016)   0.673  .501     [-0.020,  0.041]
-    ##  (06) Other and 2 or more races                  -0.100 (0.031)  -3.203  .001 **  [-0.162, -0.039]
-    ##  (98) Don't know                                  0.098 (0.146)   0.673  .501     [-0.188,  0.384]
-    ## ──────────────────────────────────────────────────────────────────────────────────────────────────
+    ## ─────────────────────────────────────────────────────────────────────────────────────
+    ##  "RACEREC"                          Effect    S.E.       t     p             [95% CI]
+    ## ─────────────────────────────────────────────────────────────────────────────────────
+    ##  (01) White                         -0.056 (0.004) -12.517 <.001 *** [-0.064, -0.047]
+    ##  (02) Black                         -0.045 (0.010)  -4.527 <.001 *** [-0.065, -0.026]
+    ##  (03) American Indian/Alaska Native -0.114 (0.032)  -3.535 <.001 *** [-0.177, -0.051]
+    ##  (04) Hispanic                      -0.060 (0.009)  -7.013 <.001 *** [-0.077, -0.043]
+    ##  (05) Asian or Pacific Islander      0.011 (0.016)   0.673  .501     [-0.020,  0.041]
+    ##  (06) Other and 2 or more races     -0.100 (0.031)  -3.203  .001 **  [-0.162, -0.039]
+    ##  (98) Don't know                     0.098 (0.146)   0.673  .501     [-0.188,  0.384]
+    ## ─────────────────────────────────────────────────────────────────────────────────────
 
 # Visualize the Results
 
@@ -608,6 +644,22 @@ PROCESS(my_dataset, y = "LONELY_sqrt", x = "RELIG_ENGAGEMENT", mods = c("EDUC"))
     ## ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 ``` r
+ggplot(data = my_dataset, aes(x = RELIG_ENGAGEMENT, y = LONELY_sqrt, color = EDUC)) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~ EDUC, ncol = 3, scales = "fixed") + 
+  labs(title = "Effect of Religious Engagement on Loneliness by Education",
+       x = "Religious Engagement",
+       y = "Sqrt-transformed Loneliness") +
+  theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
+  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA)) + 
+  theme(legend.position = "none")
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](MyProject_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+
+``` r
 model_main <- lm(LONELY_log ~ RELIG_ENGAGEMENT + RACEREC, data = my_dataset)
 summary(model_main)
 ```
@@ -621,24 +673,24 @@ summary(model_main)
     ## -0.66934 -0.30696  0.06468  0.27180  1.10511 
     ## 
     ## Coefficients:
-    ##                                                         Estimate Std. Error
-    ## (Intercept)                                             0.665353   0.010424
-    ## RELIG_ENGAGEMENT                                       -0.052973   0.003535
-    ## RACEREC(02) Non-Hispanic Black                         -0.002111   0.012321
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native  0.001598   0.036214
-    ## RACEREC(04) Hispanic                                    0.016091   0.011140
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander     -0.017741   0.019103
-    ## RACEREC(06) Other and 2 or more races                   0.056956   0.039112
-    ## RACEREC(98) Don't know                                  0.114225   0.181792
-    ##                                                        t value Pr(>|t|)    
-    ## (Intercept)                                             63.828   <2e-16 ***
-    ## RELIG_ENGAGEMENT                                       -14.986   <2e-16 ***
-    ## RACEREC(02) Non-Hispanic Black                          -0.171    0.864    
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native   0.044    0.965    
-    ## RACEREC(04) Hispanic                                     1.445    0.149    
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander      -0.929    0.353    
-    ## RACEREC(06) Other and 2 or more races                    1.456    0.145    
-    ## RACEREC(98) Don't know                                   0.628    0.530    
+    ##                                            Estimate Std. Error t value Pr(>|t|)
+    ## (Intercept)                                0.665353   0.010424  63.828   <2e-16
+    ## RELIG_ENGAGEMENT                          -0.052973   0.003535 -14.986   <2e-16
+    ## RACEREC(02) Black                         -0.002111   0.012321  -0.171    0.864
+    ## RACEREC(03) American Indian/Alaska Native  0.001598   0.036214   0.044    0.965
+    ## RACEREC(04) Hispanic                       0.016091   0.011140   1.445    0.149
+    ## RACEREC(05) Asian or Pacific Islander     -0.017741   0.019103  -0.929    0.353
+    ## RACEREC(06) Other and 2 or more races      0.056956   0.039112   1.456    0.145
+    ## RACEREC(98) Don't know                     0.114225   0.181792   0.628    0.530
+    ##                                              
+    ## (Intercept)                               ***
+    ## RELIG_ENGAGEMENT                          ***
+    ## RACEREC(02) Black                            
+    ## RACEREC(03) American Indian/Alaska Native    
+    ## RACEREC(04) Hispanic                         
+    ## RACEREC(05) Asian or Pacific Islander        
+    ## RACEREC(06) Other and 2 or more races        
+    ## RACEREC(98) Don't know                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -660,81 +712,36 @@ summary(model_interaction)
     ## -0.7426 -0.3010  0.0614  0.2716  1.1043 
     ## 
     ## Coefficients:
-    ##                                                                          Estimate
-    ## (Intercept)                                                              0.672285
-    ## RELIG_ENGAGEMENT                                                        -0.055715
-    ## RACEREC(02) Non-Hispanic Black                                          -0.030793
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                   0.158484
-    ## RACEREC(04) Hispanic                                                     0.026763
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      -0.185142
-    ## RACEREC(06) Other and 2 or more races                                    0.170578
-    ## RACEREC(98) Don't know                                                  -0.289741
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                          0.010255
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native -0.058392
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                   -0.004087
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander      0.066283
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                  -0.044512
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                  0.153993
-    ##                                                                         Std. Error
-    ## (Intercept)                                                               0.012463
-    ## RELIG_ENGAGEMENT                                                          0.004451
-    ## RACEREC(02) Non-Hispanic Black                                            0.033491
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                    0.094431
-    ## RACEREC(04) Hispanic                                                      0.027081
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                        0.045425
-    ## RACEREC(06) Other and 2 or more races                                     0.089593
-    ## RACEREC(98) Don't know                                                    0.424047
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                           0.010984
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native   0.032587
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                     0.009619
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander       0.016323
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                    0.031611
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                   0.145990
-    ##                                                                         t value
-    ## (Intercept)                                                              53.941
-    ## RELIG_ENGAGEMENT                                                        -12.517
-    ## RACEREC(02) Non-Hispanic Black                                           -0.919
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                    1.678
-    ## RACEREC(04) Hispanic                                                      0.988
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                       -4.076
-    ## RACEREC(06) Other and 2 or more races                                     1.904
-    ## RACEREC(98) Don't know                                                   -0.683
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                           0.934
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native  -1.792
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                    -0.425
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander       4.061
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                   -1.408
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                   1.055
-    ##                                                                         Pr(>|t|)
-    ## (Intercept)                                                              < 2e-16
-    ## RELIG_ENGAGEMENT                                                         < 2e-16
-    ## RACEREC(02) Non-Hispanic Black                                            0.3579
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                    0.0933
-    ## RACEREC(04) Hispanic                                                      0.3231
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      4.63e-05
-    ## RACEREC(06) Other and 2 or more races                                     0.0570
-    ## RACEREC(98) Don't know                                                    0.4945
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                           0.3505
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native   0.0732
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                     0.6709
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander     4.94e-05
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                    0.1591
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                   0.2915
-    ##                                                                            
-    ## (Intercept)                                                             ***
-    ## RELIG_ENGAGEMENT                                                        ***
-    ## RACEREC(02) Non-Hispanic Black                                             
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                  .  
-    ## RACEREC(04) Hispanic                                                       
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      ***
-    ## RACEREC(06) Other and 2 or more races                                   .  
-    ## RACEREC(98) Don't know                                                     
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                            
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native .  
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                      
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander     ***
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                     
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                    
+    ##                                                             Estimate Std. Error
+    ## (Intercept)                                                 0.672285   0.012463
+    ## RELIG_ENGAGEMENT                                           -0.055715   0.004451
+    ## RACEREC(02) Black                                          -0.030793   0.033491
+    ## RACEREC(03) American Indian/Alaska Native                   0.158484   0.094431
+    ## RACEREC(04) Hispanic                                        0.026763   0.027081
+    ## RACEREC(05) Asian or Pacific Islander                      -0.185142   0.045425
+    ## RACEREC(06) Other and 2 or more races                       0.170578   0.089593
+    ## RACEREC(98) Don't know                                     -0.289741   0.424047
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                          0.010255   0.010984
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native -0.058392   0.032587
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                      -0.004087   0.009619
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander      0.066283   0.016323
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races     -0.044512   0.031611
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                     0.153993   0.145990
+    ##                                                            t value Pr(>|t|)    
+    ## (Intercept)                                                 53.941  < 2e-16 ***
+    ## RELIG_ENGAGEMENT                                           -12.517  < 2e-16 ***
+    ## RACEREC(02) Black                                           -0.919   0.3579    
+    ## RACEREC(03) American Indian/Alaska Native                    1.678   0.0933 .  
+    ## RACEREC(04) Hispanic                                         0.988   0.3231    
+    ## RACEREC(05) Asian or Pacific Islander                       -4.076 4.63e-05 ***
+    ## RACEREC(06) Other and 2 or more races                        1.904   0.0570 .  
+    ## RACEREC(98) Don't know                                      -0.683   0.4945    
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                           0.934   0.3505    
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native  -1.792   0.0732 .  
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                       -0.425   0.6709    
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander       4.061 4.94e-05 ***
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races      -1.408   0.1591    
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                      1.055   0.2915    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -757,106 +764,86 @@ summary(model_control)
     ## -0.72533 -0.31748  0.05499  0.28475  1.13585 
     ## 
     ## Coefficients:
-    ##                                                                          Estimate
-    ## (Intercept)                                                              0.755354
-    ## RELIG_ENGAGEMENT                                                        -0.051126
-    ## RACEREC(02) Non-Hispanic Black                                          -0.037562
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                   0.143561
-    ## RACEREC(04) Hispanic                                                     0.021535
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      -0.151542
-    ## RACEREC(06) Other and 2 or more races                                    0.170129
-    ## RACEREC(98) Don't know                                                  -0.283601
-    ## EDUC(2) High school diploma or GED                                      -0.073501
-    ## EDUC(3) Attended college but did not complete a degree                  -0.070947
-    ## EDUC(4) Associate degree                                                -0.101312
-    ## EDUC(5) Bachelor's degree                                               -0.151239
-    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)       -0.153952
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                          0.010204
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native -0.058467
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                   -0.004339
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander      0.062999
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                  -0.047715
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                  0.163524
-    ##                                                                         Std. Error
-    ## (Intercept)                                                               0.021881
-    ## RELIG_ENGAGEMENT                                                          0.004466
-    ## RACEREC(02) Non-Hispanic Black                                            0.033338
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                    0.093935
-    ## RACEREC(04) Hispanic                                                      0.026949
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                        0.045340
-    ## RACEREC(06) Other and 2 or more races                                     0.089181
-    ## RACEREC(98) Don't know                                                    0.421944
-    ## EDUC(2) High school diploma or GED                                        0.020083
-    ## EDUC(3) Attended college but did not complete a degree                    0.020562
-    ## EDUC(4) Associate degree                                                  0.021981
-    ## EDUC(5) Bachelor's degree                                                 0.021161
-    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)         0.023694
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                           0.010934
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native   0.032413
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                     0.009573
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander       0.016242
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                    0.031458
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                   0.145246
-    ##                                                                         t value
-    ## (Intercept)                                                              34.521
-    ## RELIG_ENGAGEMENT                                                        -11.447
-    ## RACEREC(02) Non-Hispanic Black                                           -1.127
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                    1.528
-    ## RACEREC(04) Hispanic                                                      0.799
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                       -3.342
-    ## RACEREC(06) Other and 2 or more races                                     1.908
-    ## RACEREC(98) Don't know                                                   -0.672
-    ## EDUC(2) High school diploma or GED                                       -3.660
-    ## EDUC(3) Attended college but did not complete a degree                   -3.450
-    ## EDUC(4) Associate degree                                                 -4.609
-    ## EDUC(5) Bachelor's degree                                                -7.147
-    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)        -6.497
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                           0.933
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native  -1.804
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                    -0.453
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander       3.879
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                   -1.517
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                   1.126
-    ##                                                                         Pr(>|t|)
-    ## (Intercept)                                                              < 2e-16
-    ## RELIG_ENGAGEMENT                                                         < 2e-16
-    ## RACEREC(02) Non-Hispanic Black                                          0.259894
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                  0.126478
-    ## RACEREC(04) Hispanic                                                    0.424257
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      0.000835
-    ## RACEREC(06) Other and 2 or more races                                   0.056470
-    ## RACEREC(98) Don't know                                                  0.501523
-    ## EDUC(2) High school diploma or GED                                      0.000254
-    ## EDUC(3) Attended college but did not complete a degree                  0.000563
-    ## EDUC(4) Associate degree                                                4.11e-06
-    ## EDUC(5) Bachelor's degree                                               9.69e-13
-    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)       8.68e-11
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                         0.350752
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native 0.071298
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                   0.650357
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander     0.000106
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                  0.129365
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                 0.260268
-    ##                                                                            
-    ## (Intercept)                                                             ***
-    ## RELIG_ENGAGEMENT                                                        ***
-    ## RACEREC(02) Non-Hispanic Black                                             
-    ## RACEREC(03) Non-Hispanic American Indian/Alaska Native                     
-    ## RACEREC(04) Hispanic                                                       
-    ## RACEREC(05) Non-Hispanic Asian or Pacific Islander                      ***
-    ## RACEREC(06) Other and 2 or more races                                   .  
-    ## RACEREC(98) Don't know                                                     
-    ## EDUC(2) High school diploma or GED                                      ***
-    ## EDUC(3) Attended college but did not complete a degree                  ***
-    ## EDUC(4) Associate degree                                                ***
-    ## EDUC(5) Bachelor's degree                                               ***
-    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)       ***
-    ## RELIG_ENGAGEMENT:RACEREC(02) Non-Hispanic Black                            
-    ## RELIG_ENGAGEMENT:RACEREC(03) Non-Hispanic American Indian/Alaska Native .  
-    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                                      
-    ## RELIG_ENGAGEMENT:RACEREC(05) Non-Hispanic Asian or Pacific Islander     ***
-    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races                     
-    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                                    
+    ##                                                                    Estimate
+    ## (Intercept)                                                        0.755354
+    ## RELIG_ENGAGEMENT                                                  -0.051126
+    ## RACEREC(02) Black                                                 -0.037562
+    ## RACEREC(03) American Indian/Alaska Native                          0.143561
+    ## RACEREC(04) Hispanic                                               0.021535
+    ## RACEREC(05) Asian or Pacific Islander                             -0.151542
+    ## RACEREC(06) Other and 2 or more races                              0.170129
+    ## RACEREC(98) Don't know                                            -0.283601
+    ## EDUC(2) High school diploma or GED                                -0.073501
+    ## EDUC(3) Attended college but did not complete a degree            -0.070947
+    ## EDUC(4) Associate degree                                          -0.101312
+    ## EDUC(5) Bachelor's degree                                         -0.151239
+    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD) -0.153952
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                                 0.010204
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native        -0.058467
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                             -0.004339
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander             0.062999
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races            -0.047715
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                            0.163524
+    ##                                                                   Std. Error
+    ## (Intercept)                                                         0.021881
+    ## RELIG_ENGAGEMENT                                                    0.004466
+    ## RACEREC(02) Black                                                   0.033338
+    ## RACEREC(03) American Indian/Alaska Native                           0.093935
+    ## RACEREC(04) Hispanic                                                0.026949
+    ## RACEREC(05) Asian or Pacific Islander                               0.045340
+    ## RACEREC(06) Other and 2 or more races                               0.089181
+    ## RACEREC(98) Don't know                                              0.421944
+    ## EDUC(2) High school diploma or GED                                  0.020083
+    ## EDUC(3) Attended college but did not complete a degree              0.020562
+    ## EDUC(4) Associate degree                                            0.021981
+    ## EDUC(5) Bachelor's degree                                           0.021161
+    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)   0.023694
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                                  0.010934
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native          0.032413
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                               0.009573
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander              0.016242
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races              0.031458
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                             0.145246
+    ##                                                                   t value
+    ## (Intercept)                                                        34.521
+    ## RELIG_ENGAGEMENT                                                  -11.447
+    ## RACEREC(02) Black                                                  -1.127
+    ## RACEREC(03) American Indian/Alaska Native                           1.528
+    ## RACEREC(04) Hispanic                                                0.799
+    ## RACEREC(05) Asian or Pacific Islander                              -3.342
+    ## RACEREC(06) Other and 2 or more races                               1.908
+    ## RACEREC(98) Don't know                                             -0.672
+    ## EDUC(2) High school diploma or GED                                 -3.660
+    ## EDUC(3) Attended college but did not complete a degree             -3.450
+    ## EDUC(4) Associate degree                                           -4.609
+    ## EDUC(5) Bachelor's degree                                          -7.147
+    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD)  -6.497
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                                  0.933
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native         -1.804
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                              -0.453
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander              3.879
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races             -1.517
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                             1.126
+    ##                                                                   Pr(>|t|)    
+    ## (Intercept)                                                        < 2e-16 ***
+    ## RELIG_ENGAGEMENT                                                   < 2e-16 ***
+    ## RACEREC(02) Black                                                 0.259894    
+    ## RACEREC(03) American Indian/Alaska Native                         0.126478    
+    ## RACEREC(04) Hispanic                                              0.424257    
+    ## RACEREC(05) Asian or Pacific Islander                             0.000835 ***
+    ## RACEREC(06) Other and 2 or more races                             0.056470 .  
+    ## RACEREC(98) Don't know                                            0.501523    
+    ## EDUC(2) High school diploma or GED                                0.000254 ***
+    ## EDUC(3) Attended college but did not complete a degree            0.000563 ***
+    ## EDUC(4) Associate degree                                          4.11e-06 ***
+    ## EDUC(5) Bachelor's degree                                         9.69e-13 ***
+    ## EDUC(6) Post-Bachelor's degree (e.g., Masters, Doctorate, MD, JD) 8.68e-11 ***
+    ## RELIG_ENGAGEMENT:RACEREC(02) Black                                0.350752    
+    ## RELIG_ENGAGEMENT:RACEREC(03) American Indian/Alaska Native        0.071298 .  
+    ## RELIG_ENGAGEMENT:RACEREC(04) Hispanic                             0.650357    
+    ## RELIG_ENGAGEMENT:RACEREC(05) Asian or Pacific Islander            0.000106 ***
+    ## RELIG_ENGAGEMENT:RACEREC(06) Other and 2 or more races            0.129365    
+    ## RELIG_ENGAGEMENT:RACEREC(98) Don't know                           0.260268    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -879,8 +866,24 @@ plot(model_control, which = 2)
 ![](MyProject_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
 
 ``` r
-library(interactions)
 interact_plot(model_control, pred = RELIG_ENGAGEMENT, modx = RACEREC, interval = TRUE)
 ```
 
 ![](MyProject_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+
+``` r
+filtered_data <- cor_data %>%
+  filter(RACEREC != "(98) Don't know")
+ggplot(data = filtered_data, aes(x = RELIG_ENGAGEMENT, y = LONELY_log, color = RACEREC)) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~ RACEREC, ncol = 3, scales = "fixed") + 
+  labs(title = "Effect of Religious Engagement on Loneliness by Race",
+       x = "Religious Engagement",
+       y = "Log-transformed Loneliness") +
+  theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
+  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA), legend.position = "none")
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+![](MyProject_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->

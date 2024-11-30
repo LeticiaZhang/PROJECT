@@ -15,6 +15,8 @@ library(car)
 library(moments)
 library(boot)
 library(bruceR)
+library(interactions)
+library(ggrepel)
 load("C:/Users/zhang/OneDrive/2024-25/PSY329/ICPSR_38964-V2/ICPSR_38964/DS0001/38964-0001-Data.rda")
 dataset <- da38964.0001
 rm(da38964.0001)
@@ -34,10 +36,30 @@ my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
+my_dataset$RACEREC <- gsub("Non-Hispanic ", "", my_dataset$RACEREC)
+
 my_dataset$LONELY_A <- as.numeric(my_dataset$LONELY_A)
 my_dataset$LONELY_B <- as.numeric(my_dataset$LONELY_B)
 my_dataset$LONELY_C <- as.numeric(my_dataset$LONELY_C)
 my_dataset$LONELY <- (my_dataset$LONELY_A + my_dataset$LONELY_B + my_dataset$LONELY_C) / 3
+
+race_summary <- my_dataset %>%
+  group_by(RACEREC) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100) 
+
+ggplot(race_summary, aes(x = "", y = percentage, fill = RACEREC)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_label_repel(aes(label = paste0(round(percentage, 1), "%")),
+                   position = position_stack(vjust = 0.5),
+                   box.padding = 0.5,
+                   show.legend = FALSE) +
+  labs(title = "Race Composition of Participants", fill = "Race/Ethnicity") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text = element_blank(), axis.title = element_blank(), panel.grid = element_blank()) +
+  theme(plot.background = element_rect(fill = "#f6c1ad", color = NA)) + 
+  scale_fill_brewer(palette = "Set3")
 
 ```
 
@@ -140,6 +162,16 @@ Corr(cor_data1)
 
 PROCESS(my_dataset, y = "LONELY_sqrt", x = "RELIG_ENGAGEMENT", mods = c("EDUC"))
 
+ggplot(data = my_dataset, aes(x = RELIG_ENGAGEMENT, y = LONELY_sqrt, color = EDUC)) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~ EDUC, ncol = 3, scales = "fixed") + 
+  labs(title = "Effect of Religious Engagement on Loneliness by Education",
+       x = "Religious Engagement",
+       y = "Sqrt-transformed Loneliness") +
+  theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
+  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA)) + 
+  theme(legend.position = "none")
+
 ```
 
 ```{r}
@@ -159,7 +191,16 @@ plot(model_control, which = 1)
 # Q-Q plot for normality of residuals
 plot(model_control, which = 2)
 
-library(interactions)
 interact_plot(model_control, pred = RELIG_ENGAGEMENT, modx = RACEREC, interval = TRUE)
 
+filtered_data <- cor_data %>%
+  filter(RACEREC != "(98) Don't know")
+ggplot(data = filtered_data, aes(x = RELIG_ENGAGEMENT, y = LONELY_log, color = RACEREC)) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~ RACEREC, ncol = 3, scales = "fixed") + 
+  labs(title = "Effect of Religious Engagement on Loneliness by Race",
+       x = "Religious Engagement",
+       y = "Log-transformed Loneliness") +
+  theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
+  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA), legend.position = "none")
 ```
