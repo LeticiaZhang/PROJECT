@@ -143,7 +143,7 @@ my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
-my_dataset$RACEREC <- gsub("Non-Hispanic ", "", my_dataset$RACEREC)
+levels(my_dataset$RACEREC) <- gsub("Non-Hispanic ", "", levels(my_dataset$RACEREC))
 
 my_dataset$LONELY_A <- as.numeric(my_dataset$LONELY_A)
 my_dataset$LONELY_B <- as.numeric(my_dataset$LONELY_B)
@@ -211,9 +211,6 @@ have such kurtosis.
 leveneTest(LONELY ~ RACEREC, data = my_dataset)
 ```
 
-    ## Warning in leveneTest.default(y = y, group = group, ...): group coerced to
-    ## factor.
-
     ## Levene's Test for Homogeneity of Variance (center = median)
     ##         Df F value Pr(>F)
     ## group    6  1.3081 0.2495
@@ -242,15 +239,6 @@ cor_data <- my_dataset %>% select(RELIG_ENGAGEMENT, LONELY_log, RACEREC)
 Corr(cor_data)
 ```
 
-    ## Warning in Corr(cor_data): 强制改变过程中产生了NA
-
-    ## Warning in sqrt(n - 2): 产生了NaNs
-
-    ## Warning in psych::corr.test(data.new, method = method, adjust = p.adjust, :
-    ## Number of subjects must be greater than 3 to find confidence intervals.
-
-    ## Warning in sqrt(n[lower.tri(n)] - 3): 产生了NaNs
-
     ## NOTE: `RACEREC` transformed to numeric.
     ## 
     ## Pearson's r and 95% confidence intervals:
@@ -258,8 +246,8 @@ Corr(cor_data)
     ##                                  r       [95% CI]     p        N
     ## ────────────────────────────────────────────────────────────────
     ## RELIG_ENGAGEMENT-LONELY_log  -0.17 [-0.19, -0.15] <.001 *** 7644
-    ## RELIG_ENGAGEMENT-RACEREC           [   NA,   NaN]              0
-    ## LONELY_log-RACEREC                 [   NA,   NaN]              0
+    ## RELIG_ENGAGEMENT-RACEREC      0.01 [-0.01,  0.04]  .240     7644
+    ## LONELY_log-RACEREC            0.01 [-0.01,  0.03]  .411     7644
     ## ────────────────────────────────────────────────────────────────
 
 ![](MyProject_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->

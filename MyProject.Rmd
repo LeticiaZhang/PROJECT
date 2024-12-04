@@ -36,7 +36,7 @@ my_dataset$RELIG_ATTEND <- 6 - as.numeric(my_dataset$RELIG_ATTEND)
 my_dataset$RELIG_IMP <- 5 - as.numeric(my_dataset$RELIG_IMP)
 my_dataset$RELIG_ENGAGEMENT <- (my_dataset$RELIG_ATTEND + my_dataset$RELIG_IMP) / 2
 
-my_dataset$RACEREC <- gsub("Non-Hispanic ", "", my_dataset$RACEREC)
+levels(my_dataset$RACEREC) <- gsub("Non-Hispanic ", "", levels(my_dataset$RACEREC))
 
 my_dataset$LONELY_A <- as.numeric(my_dataset$LONELY_A)
 my_dataset$LONELY_B <- as.numeric(my_dataset$LONELY_B)
