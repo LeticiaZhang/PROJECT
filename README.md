@@ -14,6 +14,6 @@
   The key variables of the study include:
 | Variable Name | Items | Validity |
 | --- | --- | --- |
-| Religious Engagement | 1. Religious Service Attendence (1 = Never; 5 = At least once a week). 2. Religious Importance (1 = Not at all important; 4 = Very important). | Spearman’s rho = .601 |
+| Religious Engagement | 1. Religious Service Attendence (1 = Never; 5 = At least once a week) <br> 2. Religious Importance (1 = Not at all important; 4 = Very important). | Spearman’s rho = .601 |
 | Race/Ethnicity | / | / |
-| Loneliness | 1. "Lack companionship". 2. "Feel left out". 3. "Feel isolated from others". (1 = Hardly ever; 3 = Often). | Cronbach’s alpha = .816. Factor loadings: .629-.855. |
+| Loneliness | 1. "Lack companionship" <br> 2. "Feel left out" <br> 3. "Feel isolated from others" <br> (1 = Hardly ever; 3 = Often). | Cronbach’s alpha = .816 <br> Factor loadings: .629-.855. |
