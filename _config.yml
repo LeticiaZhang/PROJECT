@@ -2,3 +2,6 @@ title: Can Zhang
 description: University of Toronto
 show-downloads: true
 theme: jekyll-theme-minimal
+links:
+  - title: "Analytic Codes"
+  - url: https://github.com/LeticiaZhang/PROJECT/blob/main/MyProject.md
