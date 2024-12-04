@@ -8,13 +8,16 @@
   This project seeks to answer the question: How does religious engagement influence self-perceived loneliness, and to what extent does race/ethnicity moderate this relationship? By examining a multiracial sample, this study aims to uncover variations in how religious involvement impacts loneliness across different racial and ethnic groups.
 
 ## Approach
+### Dataset
   This project utilizes data from the National Wellbeing Survey (2022), a large, open-source dataset designed to assess various aspects of mental health and well-being among adults in the United States. The dataset includes a sample of 7,644 participants aged 18 to 64, with a mean age of 41.05 years. The participants represent a diverse racial and ethnic composition and were selected through a cross-sectional study design. Approximately 25.2% of the participants reside in rural areas, and 48% are male. The racial composition of the participants is shown in the graph below.
   
 ![Pie chart of participants' racial composition](MyProject_files/figure-gfm/unnamed-chunk-2-1.png)
   
-  The key variables of the study include:
+### Variables
 | Variable Name | Items | Validity |
 | --- | --- | --- |
 | Religious Engagement | 1. Religious Service Attendence (1 = Never; 5 = At least once a week) <br> 2. Religious Importance (1 = Not at all important; 4 = Very important) | Spearman’s rho = .601 |
 | Loneliness | 1. "Lack companionship" <br> 2. "Feel left out" <br> 3. "Feel isolated from others" <br> (1 = Hardly ever; 3 = Often) | Cronbach’s alpha = .816 <br> Factor loadings: .629-.855 |
 | Race/Ethnicity | / | / |
+
+### Analytic Methods
