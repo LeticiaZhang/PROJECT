@@ -23,3 +23,7 @@ This project utilizes data from [National Wellbeing Survey, United States, 2022]
 To address the research question, this project employs correlation analyses to examine the relationships between religious engagement, loneliness, and race/ethnicity. The analysis focuses on identifying the strength and direction of the relationships between religious engagement and loneliness and assessing how this relationship varies across different racial/ethnic groups.
 
 ## Findings
+![Correlation Matrix RLR](MyProject_files/figure-gfm/unnamed-chunk-6-1.png)
+![Line Graph RLR](MyProject_files/figure-gfm/unnamed-chunk-10-4.png)
+![Correlation Matrix RLE](MyProject_files/figure-gfm/unnamed-chunk-9-1.png)
+![Line Graph RLE](MyProject_files/figure-gfm/unnamed-chunk-9-2.png)
