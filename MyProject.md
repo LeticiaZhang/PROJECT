@@ -165,7 +165,6 @@ ggplot(race_summary, aes(x = "", y = percentage, fill = RACEREC)) +
   labs(title = "Race Composition of Participants", fill = "Race/Ethnicity") +
   theme_minimal(base_size = 14) +
   theme(axis.text = element_blank(), axis.title = element_blank(), panel.grid = element_blank()) +
-  theme(plot.background = element_rect(fill = "#f6c1ad", color = NA)) + 
   scale_fill_brewer(palette = "Set3")
 ```
 
@@ -651,7 +650,6 @@ ggplot(data = my_dataset, aes(x = RELIG_ENGAGEMENT, y = LONELY_sqrt, color = EDU
        x = "Religious Engagement",
        y = "Sqrt-transformed Loneliness") +
   theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
-  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA)) + 
   theme(legend.position = "none")
 ```
 
@@ -881,7 +879,7 @@ ggplot(data = filtered_data, aes(x = RELIG_ENGAGEMENT, y = LONELY_log, color = R
        x = "Religious Engagement",
        y = "Log-transformed Loneliness") +
   theme_minimal(base_size = 14) + theme(strip.text = element_text(size = 10)) + 
-  theme(plot.background = element_rect(fill = "#FDFDF3", color = NA), legend.position = "none")
+  theme(legend.position = "none")
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
