@@ -9,6 +9,7 @@
 
 ## Approach
   This project utilizes data from the National Wellbeing Survey (2022), a large, open-source dataset designed to assess various aspects of mental health and well-being among adults in the United States. The dataset includes a sample of 7,644 participants aged 18 to 64, with a mean age of 41.05 years. The participants represent a diverse racial and ethnic composition and were selected through a cross-sectional study design. Approximately 25.2% of the participants reside in rural areas, and 48% are male. The racial composition of the participants is shown in the graph below.
+  
 ![Pie chart of participants' racial composition](MyProject_files/figure-gfm/unnamed-chunk-2-1.png)
   
   The key variables of the study include:
