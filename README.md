@@ -43,3 +43,5 @@ The findings have implications for multiple groups. Mental health professionals 
 
 ## Credit
 Monnat, Shannon M., Zhang, Xue, Sun, Yue, Wiemers, Emily E., Wolf, Douglas A., and Montez, Jennifer Karas. National Wellbeing Survey, United States, 2022. Inter-university Consortium for Political and Social Research [distributor], 2024-05-30. https://doi.org/10.3886/ICPSR38964.v2
+
+*See Analytic Codes [here](https://github.com/LeticiaZhang/PROJECT/blob/main/MyProject.md)*
