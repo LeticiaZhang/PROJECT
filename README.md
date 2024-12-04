@@ -16,22 +16,24 @@ This project utilizes data from [National Wellbeing Survey, United States, 2022]
 ### Variables and Analytic Method
 | Variable Name | Measuring Items | Validity |
 | --- | --- | --- |
-| Religious Engagement | 1. Religious Service Attendence (1 = Never; 5 = At least once a week) <br> 2. Religious Importance (1 = Not at all important; 4 = Very important) | Spearman’s rho = .60 |
-| Loneliness | 1. "Lack companionship" <br> 2. "Feel left out" <br> 3. "Feel isolated from others" <br> (1 = Hardly ever; 3 = Often) | Cronbach’s alpha = .82 <br> Factor loadings: .63-.86 |
-| Race/Ethnicity | / | / |
+| **Religious Engagement** | 1. Religious Service Attendence (1 = Never; 5 = At least once a week) <br> 2. Religious Importance (1 = Not at all important; 4 = Very important) | Spearman’s rho = .60 |
+| **Loneliness** | 1. "Lack companionship" <br> 2. "Feel left out" <br> 3. "Feel isolated from others" <br> (1 = Hardly ever; 3 = Often) | Cronbach’s alpha = .82 <br> Factor loadings: .63-.86 |
+| **Race/Ethnicity** | / | / |
 
-To address the research question, this project employs correlation analyses to examine the relationships between religious engagement, loneliness, and race/ethnicity. The analysis focuses on identifying the strength and direction of the relationships between religious engagement and loneliness and assessing how this relationship varies across different racial/ethnic groups.
+To address the research question, this project employs **correlation analyses** to examine the relationships between religious engagement, loneliness, and race/ethnicity. The analysis focuses on identifying the strength and direction of the relationships between religious engagement and loneliness and assessing how this relationship varies across different racial/ethnic groups.
 
 ## Findings
 ![Correlation Matrix RLR](MyProject_files/figure-gfm/unnamed-chunk-6-1.png)
 
-There is a significant negative correlation between religious engagement and loneliness (r = -.17, p < .001), indicating that higher levels of religious engagement are associated with lower levels of loneliness. However, there is no significant correlation between religious engagement and race (p = .24), nor between loneliness and race (p = .41).
+There is a significant negative correlation between religious engagement and loneliness (r = -.17, p < .001), indicating that **higher** levels of religious engagement are associated with **lower** levels of loneliness. However, there is no significant correlation between religious engagement and race (p = .24), nor between loneliness and race (p = .41).
 
 ![Line Graph RLR](MyProject_files/figure-gfm/unnamed-chunk-10-4.png)
 
-There is a significant interaction effect between religious engagement and race on loneliness (F[6, 7630] = 4.15, p < .001). Specifically, the correlation is stronger among non-Hispanic American Indians/Alaska Natives (r = -.11, p < .001) and multiracial individuals  (r = -.10, p < .001), suggesting that religious engagement has the greatest impact on reducing loneliness in these two groups. Furthermore, religious engagement does not affect loneliness for non-Hispanic Asians or Pacific Islanders (p = .50).
+There is a significant interaction effect between religious engagement and race on loneliness (F[6, 7630] = 4.15, p < .001). Specifically, the correlation is **stronger** among non-Hispanic American Indians/Alaska Natives (r = -.11, p < .001) and multiracial individuals  (r = -.10, p < .001), suggesting that religious engagement has the greatest impact on reducing loneliness in these two groups. Furthermore, religious engagement **does not** affect loneliness for non-Hispanic Asians or Pacific Islanders (p = .50).
 
 ![Correlation Matrix RLE](MyProject_files/figure-gfm/unnamed-chunk-9-1.png)
 ![Line Graph RLE](MyProject_files/figure-gfm/unnamed-chunk-9-2.png)
 
-For exploratory purposes, we examined whether education level moderates the relationship between religious engagement and loneliness. While education level was found to be significantly and positively correlated with religious engagement (r = .13, p <.001), and negatively correlated with loneliness (r = -.12, p < .001), the interaction effect between religious engagement and education level on loneliness was not statistically significant (p = .88).
+For exploratory purposes, we examined whether education level moderates the relationship between religious engagement and loneliness. While education level was found to be significantly and **positively** correlated with religious engagement (r = .13, p <.001), and **negatively** correlated with loneliness (r = -.12, p < .001), the interaction effect between religious engagement and education level on loneliness was not statistically significant (p = .88).
+
+## Impact
