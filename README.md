@@ -9,11 +9,11 @@ This project seeks to answer the question: How does religious engagement influen
 
 ## Approach
 ### Dataset
-This project utilizes data from [National Wellbeing Survey, United States, 2022](https://www.icpsr.umich.edu/web/ICPSR/studies/38964/summary), a large, open-source dataset designed to assess various aspects of mental health and well-being among adults in the United States. The dataset includes a sample of 7,644 participants aged 18 to 64, with a mean age of 41.05 years. The participants represent a diverse racial and ethnic composition and were selected through a cross-sectional study design. Approximately 25.2% of the participants reside in rural areas, and 48% are male. The racial composition of the participants is shown in the graph below.
+This project utilizes data from [National Wellbeing Survey, United States, 2022](https://www.icpsr.umich.edu/web/ICPSR/studies/38964/summary), a large, open-source dataset designed to assess various aspects of mental health and well-being among adults in the United States. The data were collected through a web-based survey. The dataset includes a sample of 7,644 participants aged 18 to 64, with a mean age of 41.05 years. The participants represent a diverse racial and ethnic composition and were selected through a cross-sectional study design. Approximately 25.2% of the participants reside in rural areas, and 48% are male. The racial composition of the participants is shown in the graph below.
   
 ![Pie chart of participants' racial composition](MyProject_files/figure-gfm/unnamed-chunk-2-1.png)
   
-### Variables
+### Variables and Analytic Method
 | Variable Name | Items | Validity |
 | --- | --- | --- |
 | Religious Engagement | 1. Religious Service Attendence (1 = Never; 5 = At least once a week) <br> 2. Religious Importance (1 = Not at all important; 4 = Very important) | Spearman’s rho = .601 |
@@ -21,3 +21,5 @@ This project utilizes data from [National Wellbeing Survey, United States, 2022]
 | Race/Ethnicity | / | / |
 
 To address the research question, this project employs correlation analyses to examine the relationships between religious engagement, loneliness, and race/ethnicity. The analysis focuses on identifying the strength and direction of the relationships between religious engagement and loneliness and assessing how this relationship varies across different racial/ethnic groups.
+
+## Findings
